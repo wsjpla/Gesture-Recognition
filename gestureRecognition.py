@@ -6,11 +6,15 @@ import pandas as pd
 import os
 import glob
 from sklearn import decomposition
-from sklearn.decomposition import RandomizedPCA
+from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.decomposition import PCA as RandomizedPCA
 from scipy.fftpack import dct
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-import cPickle
+import _pickle as cPickle
 import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -23,7 +27,7 @@ def load_data():
 	list_ = []
 	for idx, file_ in enumerate(allFiles):
 		df = pd.read_csv(file_,index_col=None, header=0)
-		np_df = df.transpose().as_matrix()
+		np_df = df.transpose().values
 		input_pattern_frequency = np.array([])
 		for elm in np_df:
 			channel_in_frequency = np.fft.rfft(elm).real
@@ -31,7 +35,8 @@ def load_data():
 		input_pattern_frequency = input_pattern_frequency.reshape(1,input_pattern_frequency.size)
 		frame = pd.DataFrame.from_records(input_pattern_frequency)
 		data = data.append(frame)
-		list_.append(int(file_[20]));
+		list_.append(int(file_[90]));
+		print(file_[83:])
 	data['class'] = list_
 	data.to_csv('example.csv', index=False)
 
@@ -57,14 +62,17 @@ def main():
 		train = temp_train[temp]
 		validation = temp_train[~temp]
 		#print data
-		print "Information on dataset"
-		print "train", train.shape
-		print "valid", validation.shape
-		print "test", test.shape
+		print ("Information on dataset")
+		print ("train", train.shape)
+		print ("valid", validation.shape)
+		print ("test", test.shape)
 		test.to_csv("test_dataset.csv", sep=',',  index=False)
-		print "Running the model"
+		print ("Running the model")
 
-		model = RandomForestClassifier(n_estimators=100)
+		#model = RandomForestClassifier(n_estimators=100)
+		#model = KNeighborsClassifier(n_neighbors=10)
+		#model = Pipeline([("scaler", StandardScaler()), ("svm_clf", SVC(kernel="rbf", gamma=1, C=1))])
+		model = Pipeline([("scaler", StandardScaler()), ("svm_clf", SVC(kernel="poly", degree=3, coef0=1, C=3))])
 
 		# Fit the model to the data.
 		model.fit(train[train.columns.difference(['class'])], train["class"])
@@ -72,32 +80,40 @@ def main():
 		# Make predictions.
 		predictions = model.predict(validation[validation.columns.difference(['class'])])
 
-		# Compute the error.
+		# Compute the error.  
 		accuracy = accuracy_score(validation["class"], predictions, normalize=False) / float(validation["class"].size)
-		error_rate = 1 - accuracy
-		print error_rate
+		error_rate = 1 - accuracy                      
+		print (error_rate)
 
-		with open('RandomForestClassifier', 'wb') as f:
-			cPickle.dump(model, f)
+		#with open('RandomForestClassifier', 'wb') as f:
+		#with open('KNNClassifier', 'wb') as f:
+		#with open('KSVMClassifier', 'wb') as f:
+		with open('PKSVMClassifier', 'wb') as f:
+			cPickle.dump(model, f)    
+        
 	else:
 		data = pd.read_csv(os.path.join(os.path.dirname(__file__), "test_dataset.csv"), delimiter=',', encoding="utf-8-sig")
-		ground_truth = data["class"].as_matrix()
-		with open('RandomForestClassifier', 'rb') as f:
+		ground_truth = data["class"].values
+		#with open('RandomForestClassifier', 'rb') as f:
+		with open('KNNClassifier', 'rb') as f:
+		#with open('KSVMClassifier', 'rb') as f:
+		#with open('PKSVMClassifier', 'rb') as f:
 			rf = cPickle.load(f)
 			predictions = rf.predict(data[data.columns.difference(["class"])])
 			predictions.tofile("results.csv", sep='\n', format='%.1f')
 			ground_truth.tofile("ground_truth.csv", sep='\n', format='%.1f')
 			df = pd.DataFrame({'predictions': predictions, 'ground_truth': ground_truth})
-			print predictions
-			print ground_truth
+			print (predictions)
+			print (ground_truth)
 			sns.set(style="darkgrid")
 			sns.regplot(x="ground_truth", y='predictions', data=df);
-			sns.plt.show()
+			plt.show()
 			# Compute the error.
 			accuracy = accuracy_score(ground_truth, predictions, normalize=False) / float(ground_truth.size)
 			error_rate = 1 - accuracy
-			print "Test Error:"
-			print error_rate
+			print ("Test Error:")
+			print (error_rate)
 
 if __name__ == "__main__":
 	main()
+
