@@ -22,7 +22,7 @@ Evaluating:
 ```
 
 You can choose the ML model by editing the follow codes:
-```
+```python
 #model = RandomForestClassifier(n_estimators=100)
 #model = KNeighborsClassifier(n_neighbors=10)
 #model = Pipeline([("scaler", StandardScaler()), ("svm_clf", SVC(kernel="rbf", gamma=1, C=1))])
