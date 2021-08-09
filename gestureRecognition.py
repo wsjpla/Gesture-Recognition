@@ -95,9 +95,9 @@ def main():
 		data = pd.read_csv(os.path.join(os.path.dirname(__file__), "test_dataset.csv"), delimiter=',', encoding="utf-8-sig")
 		ground_truth = data["class"].values
 		#with open('RandomForestClassifier', 'rb') as f:
-		with open('KNNClassifier', 'rb') as f:
+		#with open('KNNClassifier', 'rb') as f:
 		#with open('KSVMClassifier', 'rb') as f:
-		#with open('PKSVMClassifier', 'rb') as f:
+		with open('PKSVMClassifier', 'rb') as f:
 			rf = cPickle.load(f)
 			predictions = rf.predict(data[data.columns.difference(["class"])])
 			predictions.tofile("results.csv", sep='\n', format='%.1f')
