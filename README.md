@@ -15,7 +15,7 @@ Train:
 ./gestureRecognition.py train
 ```
 
-## Evaluating
+Evaluating:
 
 ```bash
 ./gestureRecognition.py test
