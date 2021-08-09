@@ -28,17 +28,3 @@ You can choose the ML model by editing the follow codes:
 #model = Pipeline([("scaler", StandardScaler()), ("svm_clf", SVC(kernel="rbf", gamma=1, C=1))])
 model = Pipeline([("scaler", StandardScaler()), ("svm_clf", SVC(kernel="poly", degree=3, coef0=1, C=3))])
 ```
-
-```python
-#with open('RandomForestClassifier', 'wb') as f:
-#with open('KNNClassifier', 'wb') as f:
-#with open('KSVMClassifier', 'wb') as f:
-with open('PKSVMClassifier', 'wb') as f:
-```
-
-```python
-#with open('RandomForestClassifier', 'rb') as f:
-#with open('KNNClassifier', 'rb') as f:
-#with open('KSVMClassifier', 'rb') as f:
-with open('PKSVMClassifier', 'rb') as f:
-```
